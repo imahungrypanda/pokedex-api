@@ -22,3 +22,11 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+https://pokeapi.co/docs/v2#pokemon-section
+
+## Setup
+
+rake db:setup
+rake db:seed
+rails s
