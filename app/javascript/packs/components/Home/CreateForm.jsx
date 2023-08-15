@@ -9,11 +9,12 @@ export default () => {
     e.preventDefault()
     const data = {
       name,
-      id,
-      imageUrl,
+      id
     }
 
-    console.log(data)
+    if (imageUrl !== ``) {
+      data['image_url'] = imageUrl
+    }
     const response = await fetch('api/v1/pokemon/create', {
       method: 'POST',
       headers: {
