@@ -24,8 +24,6 @@ export default () => {
     return response.json()
   }
 
-  console.log(name, id)
-
   return (
     <div>
       <div>Add Pokemon Form</div>
