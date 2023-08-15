@@ -1,13 +1,11 @@
 import React from 'react'
 
-const PAGE_SIZE = 50
-
 export default () => {
   const [pokemon, setPokemon] = React.useState([])
-  const [offset, setOffset] = React.useState(0)
+  const [pageNumber, setPageNumber] = React.useState(0)
 
   const loadPokemon = () => {
-    const url = `api/v1/pokemon/index?limit=${PAGE_SIZE}&offset=${offset}`
+    const url = `api/v1/pokemon/index?page_number=${pageNumber}`
     fetch(url)
       .then((data) => {
         if (data.ok) {
@@ -16,7 +14,6 @@ export default () => {
         throw new Error('Network error.')
       })
       .then((data) => {
-        console.log(data)
         const newPokemon = []
 
         data.forEach((pokemon) => {
@@ -26,20 +23,15 @@ export default () => {
           })
         })
 
-        setOffset(offset + PAGE_SIZE)
-
-        if (pokemon.length === 0) {
-          setPokemon(newPokemon)
-        } else {
-          setPokemon([...newPokemon, ...pokemon])
-        }
+        setPageNumber(pageNumber + 1)
+        setPokemon([...pokemon, ...newPokemon])
       })
       .catch((err) => console.error('Error: ' + err.message))
   }
 
   return (
     <div>
-      <div>Hello</div>
+      <div>PokeDex</div>
       <button onClick={loadPokemon}>Load Pokemon</button>
       <ul>
         {pokemon.map((pokemon) => (

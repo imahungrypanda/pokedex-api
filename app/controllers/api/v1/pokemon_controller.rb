@@ -3,10 +3,8 @@ class Api::V1::PokemonController < ApplicationController
 
   # GET /pokemon or /pokemon.json
   def index
-    # TODO: implement pagination (page size and offset)
-    # example: /pokemon?page_size=10&offset=0 => 1-10
-    # example: /pokemon?page_size=10&offset=10 => 11-20
-    # example: /pokemon?page_size=10&offset=20 => 21-30
+    # TODO: implement pagination
+    # ex: page_number = 1
     @pokemon = Pokemon.all
     render json: @pokemon
   end
@@ -30,15 +28,9 @@ class Api::V1::PokemonController < ApplicationController
   def create
     @pokemon = Pokemon.new(pokemon_params)
 
-    respond_to do |format|
-      if @pokemon.save
-        format.html { redirect_to pokemon_url(@pokemon), notice: "Pokemon was successfully created." }
-        format.json { render :show, status: :created, location: @pokemon }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @pokemon.errors, status: :unprocessable_entity }
-      end
-    end
+    @pokemon.save
+
+    json { render :show, status: :created, location: @pokemon }
   end
 
   # PATCH/PUT /pokemon/1 or /pokemon/1.json
