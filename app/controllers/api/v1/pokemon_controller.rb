@@ -1,5 +1,6 @@
 class Api::V1::PokemonController < ApplicationController
   before_action :set_pokemon, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token
 
   # GET /pokemon or /pokemon.json
   def index
@@ -26,11 +27,11 @@ class Api::V1::PokemonController < ApplicationController
 
   # POST /pokemon or /pokemon.json
   def create
-    @pokemon = Pokemon.new(pokemon_params)
+    @pokemon = Pokemon.new(id: params[:id], name: params[:name])
 
     @pokemon.save
 
-    json { render :show, status: :created, location: @pokemon }
+    render json: @pokemon
   end
 
   # PATCH/PUT /pokemon/1 or /pokemon/1.json

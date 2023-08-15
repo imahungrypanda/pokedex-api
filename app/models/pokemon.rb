@@ -9,5 +9,9 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #
+
 class Pokemon < ApplicationRecord
+  validates :name, presence: true
+  validates :name, uniqueness: true
+  validates :image_url, presence: true
 end

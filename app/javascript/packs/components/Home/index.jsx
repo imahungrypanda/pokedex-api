@@ -1,4 +1,5 @@
 import React from 'react'
+import CreateForm from './CreateForm'
 
 export default () => {
   const [pokemon, setPokemon] = React.useState([])
@@ -19,7 +20,7 @@ export default () => {
         data.forEach((pokemon) => {
           newPokemon.push({
             id: pokemon.id,
-            name: pokemon.name
+            name: pokemon.name,
           })
         })
 
@@ -32,10 +33,13 @@ export default () => {
   return (
     <div>
       <div>PokeDex</div>
+      <CreateForm />
       <button onClick={loadPokemon}>Load Pokemon</button>
       <ul>
         {pokemon.map((pokemon) => (
-          <li key={pokemon.id}>{pokemon.id} - {pokemon.name}</li>
+          <li key={pokemon.id}>
+            {pokemon.id} - {pokemon.name}
+          </li>
         ))}
       </ul>
     </div>
