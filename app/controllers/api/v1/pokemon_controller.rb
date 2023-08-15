@@ -1,28 +1,32 @@
-class Api::V1::PokemonsController < ApplicationController
+class Api::V1::PokemonController < ApplicationController
   before_action :set_pokemon, only: %i[ show edit update destroy ]
 
-  # GET /pokemons or /pokemons.json
+  # GET /pokemon or /pokemon.json
   def index
-    @pokemons = Pokemon.all
-    render json: @pokemons
+    # TODO: implement pagination (page size and offset)
+    # example: /pokemon?page_size=10&offset=0 => 1-10
+    # example: /pokemon?page_size=10&offset=10 => 11-20
+    # example: /pokemon?page_size=10&offset=20 => 21-30
+    @pokemon = Pokemon.all
+    render json: @pokemon
   end
 
-  # GET /pokemons/1 or /pokemons/1.json
+  # GET /pokemon/1 or /pokemon/1.json
   def show
     @pokemon = Pokemon.find(params[:id])
     render json: @pokemon
   end
 
-  # GET /pokemons/new
+  # GET /pokemon/new
   def new
     @pokemon = Pokemon.new
   end
 
-  # GET /pokemons/1/edit
+  # GET /pokemon/1/edit
   def edit
   end
 
-  # POST /pokemons or /pokemons.json
+  # POST /pokemon or /pokemon.json
   def create
     @pokemon = Pokemon.new(pokemon_params)
 
@@ -37,7 +41,7 @@ class Api::V1::PokemonsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /pokemons/1 or /pokemons/1.json
+  # PATCH/PUT /pokemon/1 or /pokemon/1.json
   def update
     respond_to do |format|
       if @pokemon.update(pokemon_params)
@@ -50,12 +54,12 @@ class Api::V1::PokemonsController < ApplicationController
     end
   end
 
-  # DELETE /pokemons/1 or /pokemons/1.json
+  # DELETE /pokemon/1 or /pokemon/1.json
   def destroy
     @pokemon.destroy
 
     respond_to do |format|
-      format.html { redirect_to pokemons_url, notice: "Pokemon was successfully destroyed." }
+      format.html { redirect_to pokemon_url, notice: "Pokemon was successfully destroyed." }
       format.json { head :no_content }
     end
   end

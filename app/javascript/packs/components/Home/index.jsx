@@ -1,18 +1,51 @@
-import { Layout } from 'antd'
 import React from 'react'
 
+const PAGE_SIZE = 50
 
-const { Content, Footer } = Layout
+export default () => {
+  const [pokemon, setPokemon] = React.useState([])
+  const [offset, setOffset] = React.useState(0)
 
-export default () => (
-  // <Layout className='layout'>
-  //   {/* <Header /> */}
-  //   <Content style={{ padding: '0 50px' }}>
-  //     <div className='site-layout-content' style={{ margin: '100px auto' }}>
-  //       <h1>Pokedex</h1>
-  //     </div>
-  //   </Content>
-  //   <Footer style={{ textAlign: 'center' }}>Honeybadger ©2020.</Footer>
-  // </Layout>
-  <div>Hello</div>
-)
+  const loadPokemon = () => {
+    const url = `api/v1/pokemon/index?limit=${PAGE_SIZE}&offset=${offset}`
+    fetch(url)
+      .then((data) => {
+        if (data.ok) {
+          return data.json()
+        }
+        throw new Error('Network error.')
+      })
+      .then((data) => {
+        console.log(data)
+        const newPokemon = []
+
+        data.forEach((pokemon) => {
+          newPokemon.push({
+            id: pokemon.id,
+            name: pokemon.name
+          })
+        })
+
+        setOffset(offset + PAGE_SIZE)
+
+        if (pokemon.length === 0) {
+          setPokemon(newPokemon)
+        } else {
+          setPokemon([...newPokemon, ...pokemon])
+        }
+      })
+      .catch((err) => console.error('Error: ' + err.message))
+  }
+
+  return (
+    <div>
+      <div>Hello</div>
+      <button onClick={loadPokemon}>Load Pokemon</button>
+      <ul>
+        {pokemon.map((pokemon) => (
+          <li key={pokemon.id}>{pokemon.id} - {pokemon.name}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
