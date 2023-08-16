@@ -9,7 +9,7 @@ export default () => {
     e.preventDefault()
     const data = {
       name,
-      id
+      id,
     }
 
     if (imageUrl !== ``) {
@@ -38,11 +38,11 @@ export default () => {
         placeholder='Name'
         onChange={(e) => setName(e.target.value)}
       />
-      {/* <input
+      <input
         type='text'
         placeholder='Image Url'
         onChange={(e) => setImageUrl(e.target.value)}
-      /> */}
+      />
       <button onClick={submit}>Add Pokemon</button>
     </div>
   )
