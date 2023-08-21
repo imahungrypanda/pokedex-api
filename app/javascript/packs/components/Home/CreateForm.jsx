@@ -26,8 +26,14 @@ export default () => {
   }
 
   return (
-    <div>
-      <div>Add Pokemon Form</div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        paddingBottom: '40px',
+      }}>
+      <strong>Add Pokemon Form</strong>
       <input
         type='text'
         placeholder='ID'
