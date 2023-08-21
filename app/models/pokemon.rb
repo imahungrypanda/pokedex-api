@@ -13,6 +13,7 @@
 
 class Pokemon < ApplicationRecord
   validates :pokemon_id, presence: true
+  validates :pokemon_id, uniqueness: true
   validates :name, presence: true
   validates :name, uniqueness: true
   validates :image_url, presence: true
