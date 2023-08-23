@@ -9,7 +9,6 @@ class Api::V1::PokemonController < ApplicationController
     render json: @pokemon
   end
 
-
   # POST /pokemon or /pokemon.json
   def create
     @pokemon = Pokemon.new(id: params[:id], name: params[:name])
