@@ -14,3 +14,11 @@ rake db:setup
 rake db:seed
 
 rails s
+
+
+
+
+app/javascript/packs/components/Home/index.jsx
+
+
+app/controllers/api/v1/pokemon_controller.rb
