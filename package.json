@@ -13,10 +13,14 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0",
+    "sass": "^1.66.1",
     "turbolinks": "^5.2.0"
   },
   "version": "0.1.0",
   "devDependencies": {
     "webpack-dev-server": "^4.15.1"
+  },
+  "resolutions": {
+    "node-sass": "npm:sass@^1.66.1"
   }
 }
