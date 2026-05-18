@@ -59,6 +59,8 @@ GEM
     annotate (3.2.0)
       activerecord (>= 3.2, < 8.0)
       rake (>= 10.4, < 14.0)
+    base64 (0.3.0)
+    bigdecimal (4.1.2)
     bindex (0.8.1)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
@@ -67,6 +69,7 @@ GEM
     concurrent-ruby (1.2.2)
     crass (1.0.6)
     date (3.3.3)
+    drb (2.2.3)
     erubi (1.12.0)
     ffi (1.15.5)
     globalid (1.1.0)
@@ -79,6 +82,7 @@ GEM
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    logger (1.7.0)
     loofah (2.21.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -93,6 +97,7 @@ GEM
     mini_portile2 (2.8.8)
     minitest (5.19.0)
     msgpack (1.7.2)
+    mutex_m (0.3.0)
     net-imap (0.3.7)
       date
       net-protocol
@@ -106,6 +111,8 @@ GEM
     nokogiri (1.15.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
+    observer (0.1.2)
+    ostruct (0.6.3)
     puma (4.3.12)
       nio4r (~> 2.0)
     racc (1.7.1)
@@ -199,10 +206,17 @@ PLATFORMS
 
 DEPENDENCIES
   annotate
+  base64
+  bigdecimal
   bootsnap (>= 1.4.2)
   byebug
+  drb
   jbuilder (~> 2.7)
   listen (~> 3.2)
+  logger
+  mutex_m
+  observer
+  ostruct
   puma (~> 4.1)
   rails (~> 6.0.6, >= 6.0.6.1)
   sass-rails (>= 6)
@@ -215,7 +229,7 @@ DEPENDENCIES
   webpacker (~> 4.0)
 
 RUBY VERSION
-   ruby 3.3.0p0
+   ruby 3.4.5p51
 
 BUNDLED WITH
    2.5.6

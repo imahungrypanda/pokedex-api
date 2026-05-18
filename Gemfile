@@ -1,7 +1,17 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.3.0'
+ruby '3.4.5'
+
+# Ruby 3.4 removed several gems from the default-gems set. Rails 6.0 still
+# requires them at load time; remove this block once we upgrade to Rails 7.1+.
+gem 'mutex_m'
+gem 'bigdecimal'
+gem 'drb'
+gem 'observer'
+gem 'base64'
+gem 'logger'
+gem 'ostruct'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
 gem 'rails', '~> 6.0.6', '>= 6.0.6.1'

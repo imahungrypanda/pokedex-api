@@ -32,10 +32,11 @@ Tackled first because everything else (gem versions, frontend build) depends on 
 
 ### Ruby
 
-- Current: **3.3.0** (`.tool-versions`, `Gemfile`)
-- Target: **3.3.6** (latest patch in 3.3 line — minimal risk; defer 3.4 to a follow-up since it'd ride alongside the Rails upgrade)
-- Files: `.tool-versions`, `Gemfile` (`ruby '3.3.6'`)
-- Verify: `asdf install ruby 3.3.6` (or rbenv equivalent); `ruby -v`; `bundle install`; `bin/rails c` smoke
+- Current: **3.3.0** (`.tool-versions`, `.ruby-version`, `Gemfile`)
+- Target: **3.4.5** (already installed locally via rbenv)
+- Files: `.tool-versions`, `.ruby-version`, `Gemfile` (`ruby '3.4.5'`)
+- Why 3.4 over staying on 3.3: language improvements (`it` block param, frozen string literal default-warning, `Array#fetch_values`), security/perf patches, and aligns with the Rails 7.1 target. Rails 6.0 has not been formally tested against Ruby 3.4 — deprecation warnings during the brief 6.0+3.4 overlap are expected and tolerable, since we move to Rails 7.1 immediately after
+- Verify: `rbenv local 3.4.5`; `ruby -v`; `bundle install`; `bin/rails runner 'puts RUBY_VERSION'`
 
 ### Rails & core gems
 
@@ -314,7 +315,6 @@ app/javascript/
 - GraphQL subscriptions
 - Dark mode via antd `ConfigProvider`
 - Full Gen 1–9 seed (just bump `SEED_LIMIT`)
-- Ruby 3.4 upgrade (defer to a follow-up after the Rails 7.1 dust settles)
 
 ---
 
@@ -439,6 +439,7 @@ Browser checks:
 ## Risks & tradeoffs
 
 1. **Rails 6 → 7.1 upgrade churn**: Multi-step jump (6.0 → 6.1 → 7.0 → 7.1). Risk: `config.load_defaults` changes can subtly break stuff. Mitigation: bump one minor at a time, run specs between hops, accept new framework defaults explicitly
+1a. **Ruby 3.4 on Rails 6.0**: Rails 6.0 predates Ruby 3.4 by years and was never tested against it. Expect deprecation warnings (e.g. `URI::DEFAULT_PARSER`, `Net::HTTPResponse#body` quirks) during the brief overlap window. Mitigation: get to Rails 7.1 quickly; treat 3.4-on-6.0 as a transient state, not a destination
 2. **Webpacker → esbuild migration**: changes file layout, build commands, and the JS entrypoint. Risk: production asset pipeline breakage. Mitigation: do this in Phase 0 (before any UI rewrite) so we land in a known-good state before touching React code
 3. **SQLite + serialized JSON**: stats are read-only display data, not queried — fine. If filtering on stats becomes a need, migrate to Postgres with native JSONB
 4. **PokeAPI flakiness during seed**: Gen 1 cutoff + idempotent upsert + `sleep 0.1` + progress logs. Fallback to fixture JSON in `spec/fixtures/` for CI if needed
