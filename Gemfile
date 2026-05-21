@@ -13,6 +13,10 @@ gem 'base64'
 gem 'logger'
 gem 'ostruct'
 
+# Webpacker 4's bundled defaults YAML uses aliases that Psych 5 (default on
+# Ruby 3.4) rejects. Pin to Psych 4 until Webpacker is replaced with esbuild.
+gem 'psych', '< 4'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
 gem 'rails', '~> 6.0.6', '>= 6.0.6.1'
 # Use sqlite3 as the database for Active Record
