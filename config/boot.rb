@@ -1,11 +1,6 @@
 ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../Gemfile', __dir__)
 
 require 'bundler/setup' # Set up gems listed in the Gemfile.
-
-# Ruby 3.4 dropped logger from default gems; ActiveSupport 6.1 references
-# Logger at load time before our app boots. Required here so it's available
-# for both `bin/rails` and rspec entry paths. Remove once on Rails 7.1+.
-require 'logger'
 require 'yaml'
 module YAML
   class << self

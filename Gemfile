@@ -3,26 +3,16 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.4.5'
 
-# Ruby 3.4 removed several gems from the default-gems set. Rails 6.0 still
-# requires them at load time; remove this block once we upgrade to Rails 7.1+.
-gem 'mutex_m'
-gem 'bigdecimal'
-gem 'drb'
-gem 'observer'
-gem 'base64'
-gem 'logger'
-gem 'ostruct'
-
 # Webpacker 4's bundled defaults YAML uses aliases that Psych 5 (default on
-# Ruby 3.4) rejects. Pin to Psych 4 until Webpacker is replaced with esbuild.
+# Ruby 3.4) rejects. Pin to Psych 3 until Webpacker is replaced with esbuild.
 gem 'psych', '< 4'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem 'rails', '~> 7.0.8'
+gem 'rails', '~> 7.1.5'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.4'
 # Use Puma as the app server
-gem 'puma', '~> 4.1'
+gem 'puma', '~> 6.4'
 # Use SCSS for stylesheets
 gem 'sass-rails', '>= 6'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
@@ -47,7 +37,7 @@ gem 'annotate'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
-  gem 'rspec-rails', '~> 5.1'
+  gem 'rspec-rails', '~> 6.1'
   gem 'factory_bot_rails', '~> 6.4'
 end
 
