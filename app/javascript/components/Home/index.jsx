@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Row, Col, Pagination, Skeleton, Empty, Alert } from 'antd'
+import { Row, Col, Pagination, Empty, Alert } from 'antd'
 import { listPokemon } from '../api/pokemon'
 import PokemonCard from './PokemonCard'
+import CardSkeleton from './CardSkeleton'
 
 const PAGE_SIZE = 24
 
@@ -37,7 +38,7 @@ export default function Home() {
       <Row gutter={[16, 16]}>
         {Array.from({ length: PAGE_SIZE }).map((_, i) => (
           <Col key={i} xs={24} sm={12} md={8} lg={6} xl={4}>
-            <Skeleton.Image active style={{ width: '100%', height: 220 }} />
+            <CardSkeleton />
           </Col>
         ))}
       </Row>

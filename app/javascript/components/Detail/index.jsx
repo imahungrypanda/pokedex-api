@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Row, Col, Card, Skeleton, Result, Typography, Descriptions, Button } from 'antd'
+import { Row, Col, Card, Skeleton, Result, Typography, Descriptions, Button, Image } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { getPokemon } from '../api/pokemon'
 import TypeTag from '../TypeTag'
@@ -14,6 +14,11 @@ function capitalize(s) {
 
 function formatId(id) {
   return `#${String(id).padStart(3, '0')}`
+}
+
+function formatDimension(value, divisor, unit) {
+  if (value == null) return '—'
+  return `${(value / divisor).toFixed(1)} ${unit}`
 }
 
 export default function Detail() {
@@ -56,16 +61,18 @@ export default function Detail() {
         <Row gutter={[32, 24]}>
           <Col xs={24} md={10}>
             <div style={{ background: '#fafafa', borderRadius: 8, padding: 24, textAlign: 'center' }}>
-              <img
+              <Image
                 src={pokemon.image_url}
-                alt={pokemon.name}
+                alt={`${pokemon.name} sprite`}
+                preview={false}
                 style={{ width: '100%', maxWidth: 360, height: 'auto' }}
+                fallback="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23f0f0f0'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif'>No image</text></svg>"
               />
             </div>
           </Col>
           <Col xs={24} md={14}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <Title level={2} style={{ margin: 0, textTransform: 'capitalize' }}>
+              <Title level={1} style={{ margin: 0, textTransform: 'capitalize' }}>
                 {capitalize(pokemon.name)}
               </Title>
               <span style={{ color: '#999', fontSize: 16 }}>{formatId(pokemon.pokemon_id)}</span>
@@ -81,12 +88,14 @@ export default function Detail() {
 
             <Descriptions size="small" column={2} style={{ marginTop: 16, marginBottom: 24 }}>
               <Descriptions.Item label="Height">
-                {(pokemon.height_dm / 10).toFixed(1)} m
+                {formatDimension(pokemon.height_dm, 10, 'm')}
               </Descriptions.Item>
               <Descriptions.Item label="Weight">
-                {(pokemon.weight_hg / 10).toFixed(1)} kg
+                {formatDimension(pokemon.weight_hg, 10, 'kg')}
               </Descriptions.Item>
-              <Descriptions.Item label="Generation">{pokemon.generation}</Descriptions.Item>
+              <Descriptions.Item label="Generation">
+                {pokemon.generation ?? '—'}
+              </Descriptions.Item>
             </Descriptions>
 
             <Title level={4}>Base Stats</Title>
