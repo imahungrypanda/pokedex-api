@@ -1,0 +1,148 @@
+require "net/http"
+require "json"
+
+namespace :pokedex do
+  desc "Seed the database with Pokemon data from PokeAPI. Pass LIMIT=N to cap (default: all)."
+  task seed: :environment do
+    limit = ENV["LIMIT"]&.to_i
+    PokedexSeeder.new(limit: limit).run
+  end
+end
+
+class PokedexSeeder
+  API_BASE      = "https://pokeapi.co/api/v2"
+  CONCURRENCY   = 10
+  LOG_EVERY     = 25
+  IMAGE_DIR     = Rails.root.join("public", "pokemon")
+
+  def initialize(limit: nil)
+    @limit = limit
+  end
+
+  def run
+    total = @limit || discover_total
+    puts "Seeding #{total} pokemon (concurrency=#{CONCURRENCY})..."
+    FileUtils.mkdir_p(IMAGE_DIR)
+
+    started_at = Time.now
+    records    = fetch_all(total)
+    puts "Fetched #{records.size} records in #{(Time.now - started_at).round(1)}s. Writing to DB..."
+
+    write(records)
+
+    elapsed = (Time.now - started_at).round(1)
+    puts "Done in #{elapsed}s. Pokemon.count = #{Pokemon.count}"
+  end
+
+  private
+
+  def discover_total
+    res = get_json("#{API_BASE}/pokemon?limit=1")
+    res.fetch("count")
+  end
+
+  def fetch_all(total)
+    queue   = (1..total).to_a
+    mutex   = Mutex.new
+    results = []
+    fetched = 0
+
+    workers = Array.new(CONCURRENCY) do
+      Thread.new do
+        loop do
+          id = mutex.synchronize { queue.shift }
+          break unless id
+
+          row = fetch_one(id)
+          next unless row
+
+          mutex.synchronize do
+            results << row
+            fetched += 1
+            puts "  fetched #{fetched}/#{total}" if (fetched % LOG_EVERY).zero?
+          end
+        rescue => e
+          warn "  [error] pokemon_id=#{id}: #{e.class}: #{e.message}"
+        end
+      end
+    end
+    workers.each(&:join)
+    results.sort_by { |r| r[:pokemon_id] }
+  end
+
+  def fetch_one(id)
+    pokemon = get_json("#{API_BASE}/pokemon/#{id}")
+    species = get_json("#{API_BASE}/pokemon-species/#{id}")
+    row     = map_payload(pokemon, species)
+    download_image(row[:pokemon_id], row[:remote_image_url])
+    row[:image_url] = "/pokemon/#{row[:pokemon_id]}.png"
+    row.delete(:remote_image_url)
+    row
+  end
+
+  def download_image(pokemon_id, url)
+    return if url.nil?
+    dest = IMAGE_DIR.join("#{pokemon_id}.png")
+    return if File.exist?(dest) && File.size(dest) > 0
+
+    uri = URI(url)
+    Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 10, read_timeout: 30) do |http|
+      res = http.get(uri.request_uri, "User-Agent" => "pokedex-api-seed/1.0")
+      raise "image HTTP #{res.code} for #{url}" unless res.is_a?(Net::HTTPSuccess)
+      File.binwrite(dest, res.body)
+    end
+  end
+
+  def map_payload(pokemon, species)
+    sprites = pokemon["sprites"] || {}
+    image_url = sprites.dig("other", "official-artwork", "front_default") ||
+                sprites["front_default"]
+
+    types = pokemon["types"].sort_by { |t| t["slot"] }
+    base_stats = pokemon["stats"].each_with_object({}) do |s, h|
+      h[s["stat"]["name"].tr("-", "_")] = s["base_stat"]
+    end
+
+    english_flavor = species["flavor_text_entries"]
+      .find { |e| e.dig("language", "name") == "en" }
+      &.dig("flavor_text")
+      &.tr("\n\f", " ")
+      &.squeeze(" ")
+      &.strip
+
+    {
+      pokemon_id:       pokemon["id"],
+      name:             pokemon["name"],
+      pokemon_type:     types[0]&.dig("type", "name"),
+      secondary_type:   types[1]&.dig("type", "name"),
+      remote_image_url: image_url,
+      height_dm:        pokemon["height"],
+      weight_hg:        pokemon["weight"],
+      base_stats:       base_stats,
+      description:      english_flavor,
+      generation:       species.dig("generation", "url")&.match(%r{/generation/(\d+)/})&.captures&.first&.to_i,
+    }
+  end
+
+  def write(records)
+    written = 0
+    Pokemon.transaction do
+      records.each do |attrs|
+        record = Pokemon.find_or_initialize_by(pokemon_id: attrs[:pokemon_id])
+        record.assign_attributes(attrs)
+        record.save!
+        written += 1
+        puts "  wrote #{written}/#{records.size}" if (written % 100).zero?
+      end
+    end
+  end
+
+  def get_json(url)
+    uri = URI(url)
+    res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", open_timeout: 10, read_timeout: 30) do |http|
+      http.get(uri.request_uri, "User-Agent" => "pokedex-api-seed/1.0")
+    end
+    raise "HTTP #{res.code} for #{url}" unless res.is_a?(Net::HTTPSuccess)
+    JSON.parse(res.body)
+  end
+end
