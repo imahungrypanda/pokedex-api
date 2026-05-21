@@ -9,6 +9,12 @@ class Api::V1::PokemonController < ApplicationController
     render json: @pokemon
   end
 
+  def show
+    pokemon = Pokemon.find_by(pokemon_id: params[:id])
+    return render(json: { error: "Not found" }, status: :not_found) unless pokemon
+    render json: pokemon
+  end
+
   # POST /pokemon or /pokemon.json
   def create
     @pokemon = Pokemon.new(id: params[:id], name: params[:name])

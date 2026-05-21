@@ -1,52 +1,74 @@
-import React from 'react'
-import CreateForm from './CreateForm'
+import React, { useEffect, useState, useMemo } from 'react'
+import { Row, Col, Pagination, Skeleton, Empty, Alert } from 'antd'
+import { listPokemon } from '../api/pokemon'
+import PokemonCard from './PokemonCard'
 
-export default () => {
-  const [pokemon, setPokemon] = React.useState([])
-  const [pageNumber, setPageNumber] = React.useState(0)
+const PAGE_SIZE = 24
 
-  const loadPokemon = () => {
-    const url = `api/v1/pokemon/index?page_number=${pageNumber}`
-    fetch(url)
-      .then((data) => {
-        if (data.ok) {
-          return data.json()
-        }
-        throw new Error('Network error.')
+export default function Home() {
+  const [pokemon, setPokemon]   = useState([])
+  const [page, setPage]         = useState(1)
+  const [loading, setLoading]   = useState(true)
+  const [error, setError]       = useState(null)
+
+  useEffect(() => {
+    listPokemon()
+      .then((rows) => {
+        setPokemon(rows.sort((a, b) => a.pokemon_id - b.pokemon_id))
+        setLoading(false)
       })
-      .then((data) => {
-        const newPokemon = []
-
-        data.forEach((pokemon) => {
-          newPokemon.push({
-            id: pokemon.id,
-            name: pokemon.name,
-          })
-        })
-
-        setPageNumber(pageNumber + 1)
-        setPokemon([...pokemon, ...newPokemon])
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
       })
-      .catch((err) => console.error('Error: ' + err.message))
+  }, [])
+
+  const pageRows = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE
+    return pokemon.slice(start, start + PAGE_SIZE)
+  }, [pokemon, page])
+
+  if (error) {
+    return <Alert type="error" message="Could not load Pokémon" description={error} showIcon />
+  }
+
+  if (loading) {
+    return (
+      <Row gutter={[16, 16]}>
+        {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+          <Col key={i} xs={24} sm={12} md={8} lg={6} xl={4}>
+            <Skeleton.Image active style={{ width: '100%', height: 220 }} />
+          </Col>
+        ))}
+      </Row>
+    )
+  }
+
+  if (pokemon.length === 0) {
+    return <Empty description="No Pokémon found." />
   }
 
   return (
-    <div>
-      <h1>PokeDex</h1>
-      <CreateForm />
-      <button onClick={loadPokemon}>Next Page</button>
-      <ul
-        style={{
-          maxHeight: '500px',
-          overflow: 'scroll',
-        }}>
-        {pokemon.map((pokemon) => (
-          <li key={pokemon.id}>
-            {pokemon.id} - {pokemon.name}
-          </li>
+    <>
+      <Row gutter={[16, 16]}>
+        {pageRows.map((p) => (
+          <Col key={p.pokemon_id} xs={24} sm={12} md={8} lg={6} xl={4}>
+            <PokemonCard pokemon={p} />
+          </Col>
         ))}
-        {pokemon.length === 0 && <li>No Pokemon found.</li>}
-      </ul>
-    </div>
+      </Row>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+        <Pagination
+          current={page}
+          pageSize={PAGE_SIZE}
+          total={pokemon.length}
+          showSizeChanger={false}
+          onChange={(p) => {
+            setPage(p)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+        />
+      </div>
+    </>
   )
 }
