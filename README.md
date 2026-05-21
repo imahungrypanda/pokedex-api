@@ -1,75 +1,74 @@
 # Pokédex API
 
-A Rails + React application for managing and browsing Pokémon data. Features a RESTful API backend built with Rails and a modern React frontend with Ant Design.
+A Rails + React application for managing and browsing Pokémon data. RESTful API backend with a React frontend using Ant Design.
 
 ## Tech Stack
 
-- **Backend**: Ruby on Rails 6.0.6
-- **Frontend**: React 18.2.0 with Ant Design
+- **Backend**: Ruby on Rails 7.2
+- **Frontend**: React 18 with Ant Design
 - **Database**: SQLite3 (development)
-- **Build Tools**: Webpacker 4.0
+- **JS Bundling**: esbuild (via jsbundling-rails)
+- **Testing**: RSpec + FactoryBot
 
 ## Prerequisites
 
-### Required Software
-
-- **Ruby**: 3.3.0 (see `.ruby-version`)
-- **Node.js**: 18.20.8+ (tested with v18.20.8 and v22.14.0)
-- **Yarn**: 1.22.22+
-- **SQLite3**: For database
-- **Bundler**: For Ruby gem management
+- **Ruby**: 3.4.5 (see `.ruby-version` / `.tool-versions`)
+- **Node.js**: 22+ (see `.tool-versions`)
+- **Yarn**: 1.22+
+- **SQLite3**
 
 ## Installation
 
-### 1. Install Runtime Versions
-- Ruby 3.3.0
-- Node.js 18.20.8+
-- Yarn 1.22.22+
-
-### 2. Install Dependencies
-
 ```bash
-# Install Ruby gems
 bundle install
-
-# Install JavaScript packages
-# Note: Use --ignore-scripts to avoid node-sass build issues
-yarn install --ignore-scripts
+yarn install
+bin/rails db:setup
 ```
 
-### 3. Setup Database
+`db:setup` creates the SQLite database, runs migrations, and loads seeds.
+
+## Running the App
 
 ```bash
-# Create and seed the database
-rails db:setup
-# or
-rake db:setup
+bin/dev
 ```
 
-### 4. Compile Frontend Assets
+`bin/dev` uses Foreman to run two processes together (defined in `Procfile.dev`):
+- Rails server on port 3000
+- esbuild in watch mode, rebuilding `app/assets/builds/application.js` on every change
+
+The app is available at <http://localhost:3000>.
+
+> If you don't have Foreman installed, `bin/dev` will install it on first run.
+
+### Running them separately
 
 ```bash
-./bin/webpack
+# terminal 1
+bin/rails s
+
+# terminal 2
+yarn build --watch
 ```
 
-### 5. Start the Server
+## Testing
 
 ```bash
-rails server
-# or
-rails s
+bundle exec rspec
 ```
 
-The app will be available at `http://localhost:3000`
+## Build Notes
 
-## API Documentation
+- esbuild compiles `app/javascript/application.js` into `app/assets/builds/application.js`. The build is configured in `package.json` under `scripts.build`, including `--loader:.js=jsx` so JSX in `.js` files works.
+- Sprockets is used only to serve the built JS (digest fingerprinting, asset linking). No CSS bundling — Ant Design ships its own CSS-in-JS.
 
-### Endpoints
+## API Endpoints
 
-- `GET /api/v1/pokemon/index` - List all Pokémon
-- `POST /api/v1/pokemon/create` - Create a new Pokémon
+- `GET /api/v1/pokemon/index` — List all Pokémon
+- `POST /api/v1/pokemon/create` — Create a Pokémon
+- `DELETE /api/v1/pokemon/:id` — Delete by Pokédex ID *(route exists; handler not yet implemented — see [docs/plans/full-pokedex-buildout.md](docs/plans/full-pokedex-buildout.md))*
 
-For detailed API testing examples with curl commands, see [docs/api_testing.md](docs/api_testing.md)
+See [docs/api_testing.md](docs/api_testing.md) for curl examples.
 
 ## Project Structure
 
@@ -77,44 +76,23 @@ For detailed API testing examples with curl commands, see [docs/api_testing.md](
 pokedex-api/
 ├── app/
 │   ├── controllers/
-│   │   └── api/v1/          # API controllers
-│   ├── models/              # ActiveRecord models
-│   ├── javascript/packs/    # React components
-│   └── views/               # Rails views
-├── config/                  # Configuration files
-├── db/                      # Database files
-├── docs/                    # Documentation
-│   └── api_testing.md       # API testing guide
-├── public/                  # Static assets
-└── test/                    # Test files
+│   │   └── api/v1/             # JSON API controllers
+│   ├── models/                 # ActiveRecord models
+│   ├── javascript/
+│   │   ├── application.js      # esbuild entrypoint, mounts React
+│   │   └── components/         # React components
+│   └── assets/builds/          # esbuild output (gitignored)
+├── config/                     # Rails configuration
+├── db/                         # Schema, migrations, seeds
+├── docs/
+│   ├── api_testing.md          # curl examples
+│   ├── user_stories.md         # Product intent + outstanding tasks
+│   ├── interview_summaries.md
+│   └── plans/                  # Multi-phase build-out plan
+├── spec/                       # RSpec specs + factories
+└── public/                     # Static assets
 ```
 
-## Development Workflow
+## Plan
 
-### Running the Application
-
-```bash
-# Terminal 1: Start Rails server
-rails s
-
-# Terminal 2: Start Webpack dev server (optional, for hot reloading)
-./bin/webpack-dev-server
-```
-
-### Testing the API
-
-Use the curl commands in [docs/api_testing.md](docs/api_testing.md) or tools like:
-- curl
-- Postman
-- Insomnia
-
-Example:
-```bash
-# List all Pokémon
-curl http://localhost:3000/api/v1/pokemon/index
-
-# Create a Pokémon
-curl -X POST http://localhost:3000/api/v1/pokemon/create \
-  -H "Content-Type: application/json" \
-  -d '{"id": 25, "name": "Pikachu"}'
-```
+Active build-out plan in [docs/plans/full-pokedex-buildout.md](docs/plans/full-pokedex-buildout.md) — turns this skeleton into a full pokedex (schema expansion + PokeAPI seed, REST + GraphQL, RSpec coverage, antd UI overhaul).
