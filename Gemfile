@@ -3,22 +3,14 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.4.5'
 
-# Webpacker 4's bundled defaults YAML uses aliases that Psych 5 (default on
-# Ruby 3.4) rejects. Pin to Psych 3 until Webpacker is replaced with esbuild.
-gem 'psych', '< 4'
-
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
 gem 'rails', '~> 7.1.5'
+gem 'sprockets-rails'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3', '~> 1.4'
 # Use Puma as the app server
 gem 'puma', '~> 6.4'
-# Use SCSS for stylesheets
-gem 'sass-rails', '>= 6'
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker', '~> 4.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
+# Bundle JavaScript via esbuild (Rails 7 default)
+gem 'jsbundling-rails', '~> 1.3'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production

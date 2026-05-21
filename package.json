@@ -1,27 +1,18 @@
 {
   "name": "pokedex_api",
   "private": true,
+  "version": "0.1.0",
   "dependencies": {
-    "@babel/preset-react": "^7.22.5",
-    "@rails/actioncable": "^6.0.0",
-    "@rails/activestorage": "^6.0.0",
-    "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "4.3.0",
     "antd": "^5.8.3",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.15.0",
-    "sass": "^1.66.1",
-    "turbolinks": "^5.2.0"
+    "react-router-dom": "^6.15.0"
   },
-  "version": "0.1.0",
   "devDependencies": {
-    "webpack-dev-server": "^3.11.3"
+    "esbuild": "^0.28.0"
   },
-  "resolutions": {
-    "node-sass": "npm:sass@^1.66.1"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "scripts": {
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.js=jsx"
+  }
 }
