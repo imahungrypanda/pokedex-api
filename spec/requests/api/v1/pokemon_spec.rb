@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Pokemon', type: :request do
@@ -9,9 +11,9 @@ RSpec.describe 'Api::V1::Pokemon', type: :request do
       get '/api/v1/pokemon/index'
 
       expect(response).to have_http_status(:ok)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body.length).to eq(2)
-      expect(body.map { |p| p['name'] }).to contain_exactly('bulbasaur', 'charmander')
+      expect(body.pluck('name')).to contain_exactly('bulbasaur', 'charmander')
     end
   end
 end

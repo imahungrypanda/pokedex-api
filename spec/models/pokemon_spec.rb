@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Pokemon, type: :model do
   describe 'validations' do
     it 'requires pokemon_id, name, and image_url' do
-      pokemon = Pokemon.new
+      pokemon = described_class.new
       expect(pokemon).not_to be_valid
       expect(pokemon.errors[:pokemon_id]).to include("can't be blank")
       expect(pokemon.errors[:name]).to include("can't be blank")
@@ -41,39 +43,41 @@ RSpec.describe Pokemon, type: :model do
   end
 
   describe 'scopes' do
-    let!(:bulbasaur) { create(:pokemon, pokemon_id: 1, name: 'bulbasaur', pokemon_type: 'grass', secondary_type: 'poison') }
+    let!(:bulbasaur) do
+      create(:pokemon, pokemon_id: 1, name: 'bulbasaur', pokemon_type: 'grass', secondary_type: 'poison')
+    end
     let!(:charmander) { create(:pokemon, pokemon_id: 4, name: 'charmander', pokemon_type: 'fire') }
     let!(:pikachu) { create(:pokemon, pokemon_id: 25, name: 'pikachu', pokemon_type: 'electric') }
 
     describe '.ordered' do
       it 'orders by pokemon_id ascending' do
-        expect(Pokemon.ordered.pluck(:pokemon_id)).to eq([1, 4, 25])
+        expect(described_class.ordered.pluck(:pokemon_id)).to eq([1, 4, 25])
       end
     end
 
     describe '.by_type' do
       it 'matches the primary type' do
-        expect(Pokemon.by_type('fire')).to contain_exactly(charmander)
+        expect(described_class.by_type('fire')).to contain_exactly(charmander)
       end
 
       it 'matches the secondary type too' do
-        expect(Pokemon.by_type('poison')).to contain_exactly(bulbasaur)
+        expect(described_class.by_type('poison')).to contain_exactly(bulbasaur)
       end
 
       it 'returns all records when blank' do
-        expect(Pokemon.by_type(nil).count).to eq(3)
-        expect(Pokemon.by_type('').count).to eq(3)
+        expect(described_class.by_type(nil).count).to eq(3)
+        expect(described_class.by_type('').count).to eq(3)
       end
     end
 
     describe '.search_name' do
       it 'matches a case-insensitive partial' do
-        expect(Pokemon.search_name('PIKA')).to contain_exactly(pikachu)
-        expect(Pokemon.search_name('char')).to contain_exactly(charmander)
+        expect(described_class.search_name('PIKA')).to contain_exactly(pikachu)
+        expect(described_class.search_name('char')).to contain_exactly(charmander)
       end
 
       it 'returns all records when blank' do
-        expect(Pokemon.search_name(nil).count).to eq(3)
+        expect(described_class.search_name(nil).count).to eq(3)
       end
     end
   end
