@@ -21,17 +21,26 @@ class PokedexSeeder
 
   def run
     total = @limit || discover_total
-    puts "Seeding #{total} pokemon (concurrency=#{CONCURRENCY})..."
     FileUtils.mkdir_p(IMAGE_DIR)
 
-    started_at = Time.now
-    records    = fetch_all(total)
-    puts "Fetched #{records.size} records in #{(Time.now - started_at).round(1)}s. Writing to DB..."
+    puts "Seeding #{total} pokemon from PokeAPI (concurrency=#{CONCURRENCY})."
+    puts "This pulls #{total} records + downloads sprites to public/pokemon/."
+    puts "Expect ~#{(total * 0.07).ceil}s on a typical connection."
+    puts
 
+    started_at = Time.now
+    records, failures = fetch_all(total)
+
+    if failures.any?
+      warn "  [warn] #{failures.size} pokemon failed to fetch: #{failures.first(5).join(', ')}#{'...' if failures.size > 5}"
+    end
+
+    puts "Fetched #{records.size}/#{total} records in #{(Time.now - started_at).round(1)}s. Writing to DB..."
     write(records)
 
-    elapsed = (Time.now - started_at).round(1)
-    puts "Done in #{elapsed}s. Pokemon.count = #{Pokemon.count}"
+    elapsed   = (Time.now - started_at).round(1)
+    image_mb  = Dir[IMAGE_DIR.join('*.png')].sum { |f| File.size(f) } / 1_048_576.0
+    puts "Done in #{elapsed}s. Pokemon.count = #{Pokemon.count}. Sprites: #{image_mb.round(1)} MB in public/pokemon/."
   end
 
   private
@@ -39,13 +48,16 @@ class PokedexSeeder
   def discover_total
     res = get_json("#{API_BASE}/pokemon?limit=1")
     res.fetch("count")
+  rescue => e
+    abort "Could not reach PokeAPI (#{e.class}: #{e.message}). Pass LIMIT=N to skip discovery, or check your network."
   end
 
   def fetch_all(total)
-    queue   = (1..total).to_a
-    mutex   = Mutex.new
-    results = []
-    fetched = 0
+    queue    = (1..total).to_a
+    mutex    = Mutex.new
+    results  = []
+    failures = []
+    fetched  = 0
 
     workers = Array.new(CONCURRENCY) do
       Thread.new do
@@ -53,21 +65,22 @@ class PokedexSeeder
           id = mutex.synchronize { queue.shift }
           break unless id
 
-          row = fetch_one(id)
-          next unless row
-
-          mutex.synchronize do
-            results << row
-            fetched += 1
-            puts "  fetched #{fetched}/#{total}" if (fetched % LOG_EVERY).zero?
+          begin
+            row = fetch_one(id)
+            mutex.synchronize do
+              results << row
+              fetched += 1
+              puts "  fetched #{fetched}/#{total}" if (fetched % LOG_EVERY).zero?
+            end
+          rescue => e
+            warn "  [error] pokemon_id=#{id}: #{e.class}: #{e.message}"
+            mutex.synchronize { failures << id }
           end
-        rescue => e
-          warn "  [error] pokemon_id=#{id}: #{e.class}: #{e.message}"
         end
       end
     end
     workers.each(&:join)
-    results.sort_by { |r| r[:pokemon_id] }
+    [results.sort_by { |r| r[:pokemon_id] }, failures.sort]
   end
 
   def fetch_one(id)
