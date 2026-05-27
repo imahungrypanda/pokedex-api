@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Layout, Button } from 'antd'
+import { Layout, Button, Modal } from 'antd'
+import CreateForm from '../Home/CreateForm'
 
 const { Header, Content } = Layout
 
 export default function AppLayout({ children }) {
+  const [addOpen, setAddOpen] = useState(false)
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -12,13 +15,22 @@ export default function AppLayout({ children }) {
           PokéDex
         </Link>
         <span style={{ flex: 1 }} />
-        <Link to="/new">
-          <Button type="primary">Add Pokémon</Button>
-        </Link>
+        <Button type="primary" onClick={() => setAddOpen(true)}>
+          Add Pokémon
+        </Button>
       </Header>
       <Content style={{ padding: '24px', maxWidth: 1400, margin: '0 auto', width: '100%' }}>
         {children}
       </Content>
+      <Modal
+        title="Add Pokémon"
+        open={addOpen}
+        onCancel={() => setAddOpen(false)}
+        footer={null}
+        destroyOnClose
+      >
+        <CreateForm onSuccess={() => setAddOpen(false)} />
+      </Modal>
     </Layout>
   )
 }

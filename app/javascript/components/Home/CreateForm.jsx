@@ -1,55 +1,56 @@
 import React from 'react'
+import { Form, Input, Button, message } from 'antd'
 
-export default () => {
-  const [name, setName] = React.useState('')
-  const [id, setId] = React.useState('')
-  const [imageUrl, setImageUrl] = React.useState('')
+export default function CreateForm({ onSuccess }) {
+  const [form] = Form.useForm()
+  const [submitting, setSubmitting] = React.useState(false)
 
-  const submit = async (e) => {
-    e.preventDefault()
-    const data = {
-      name,
-      id,
+  const submit = async (values) => {
+    setSubmitting(true)
+    const data = { id: values.id, name: values.name }
+    if (values.image_url) data.image_url = values.image_url
+
+    try {
+      const res = await fetch('/api/v1/pokemon/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      message.success(`Added ${values.name}.`)
+      form.resetFields()
+      onSuccess?.()
+    } catch (err) {
+      message.error(`Could not add Pokémon: ${err.message}`)
+    } finally {
+      setSubmitting(false)
     }
-
-    if (imageUrl !== ``) {
-      data['image_url'] = imageUrl
-    }
-    const response = await fetch('api/v1/pokemon/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    return response.json()
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        paddingBottom: '40px',
-      }}>
-      <strong>Add Pokemon Form</strong>
-      <input
-        type='text'
-        placeholder='ID'
-        onChange={(e) => setId(e.target.value)}
-      />
-      <input
-        type='text'
-        placeholder='Name'
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type='text'
-        placeholder='Image Url'
-        onChange={(e) => setImageUrl(e.target.value)}
-      />
-      <button onClick={submit}>Add Pokemon</button>
-    </div>
+    <Form form={form} layout="vertical" onFinish={submit} requiredMark={false}>
+      <Form.Item
+        label="Pokédex ID"
+        name="id"
+        rules={[{ required: true, message: 'ID is required' }]}
+      >
+        <Input type="number" min={1} placeholder="e.g. 1026" />
+      </Form.Item>
+      <Form.Item
+        label="Name"
+        name="name"
+        rules={[{ required: true, message: 'Name is required' }]}
+      >
+        <Input placeholder="e.g. mewtwo" />
+      </Form.Item>
+      <Form.Item label="Image URL" name="image_url">
+        <Input placeholder="https://… or /pokemon/N.png" />
+      </Form.Item>
+      <Form.Item style={{ marginBottom: 0 }}>
+        <Button type="primary" htmlType="submit" loading={submitting}>
+          Add Pokémon
+        </Button>
+      </Form.Item>
+    </Form>
   )
 }
