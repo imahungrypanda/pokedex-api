@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Row, Col, Pagination, Empty, Alert } from 'antd'
+import { Row, Col, Pagination, Empty, Alert, Modal } from 'antd'
 import { listPokemon } from '../api/pokemon'
 import PokemonCard from './PokemonCard'
 import CardSkeleton from './CardSkeleton'
+import PokemonDetail from '../Detail/PokemonDetail'
 
 const PAGE_SIZE = 24
 
@@ -11,6 +12,7 @@ export default function Home() {
   const [page, setPage]         = useState(1)
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState(null)
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     listPokemon()
@@ -54,7 +56,7 @@ export default function Home() {
       <Row gutter={[16, 16]}>
         {pageRows.map((p) => (
           <Col key={p.pokemon_id} xs={24} sm={12} md={8} lg={6} xl={4}>
-            <PokemonCard pokemon={p} />
+            <PokemonCard pokemon={p} onSelect={() => setSelected(p)} />
           </Col>
         ))}
       </Row>
@@ -70,6 +72,15 @@ export default function Home() {
           }}
         />
       </div>
+      <Modal
+        open={selected !== null}
+        onCancel={() => setSelected(null)}
+        footer={null}
+        width={800}
+        destroyOnClose
+      >
+        <PokemonDetail pokemon={selected} />
+      </Modal>
     </>
   )
 }
