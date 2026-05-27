@@ -7,8 +7,18 @@ module Api
 
       # GET /pokemon or /pokemon.json
       def index
-        # TODO: implement pagination
-        # ex: page_number = 1
+        # TODO: implement pagination.
+        #
+        # The frontend already sends `?page_number=N&per_page=M` on every
+        # request and expects this envelope back:
+        #
+        #   {
+        #     "data": [ <pokemon>, ... ],
+        #     "meta": { "page": N, "per_page": M, "total": T, "total_pages": P }
+        #   }
+        #
+        # Until that lands, the UI falls back to slicing the flat array
+        # client-side (see app/javascript/components/api/pokemon.js).
         @pokemon = Pokemon.all
         render json: @pokemon
       end
