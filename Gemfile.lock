@@ -142,6 +142,7 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
+    netrc (0.11.0)
     nio4r (2.7.5)
     nokogiri (1.19.3-arm64-darwin)
       racc (~> 1.4)
@@ -203,6 +204,13 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbi (0.3.13)
+      prism (~> 1.0)
+      rbs (>= 4.0.1)
+    rbs (4.0.2)
+      logger
+      prism (>= 1.6.0)
+      tsort
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
@@ -210,6 +218,8 @@ GEM
     regexp_parser (2.12.0)
     reline (0.6.3)
       io-console (~> 0.5)
+    require-hooks (0.4.0)
+    rexml (3.4.4)
     rspec-core (3.13.6)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.5)
@@ -251,7 +261,23 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.81)
     ruby-progressbar (1.13.0)
+    rubydex (0.2.5-arm64-darwin)
     securerandom (0.4.1)
+    sorbet (0.6.13296)
+      sorbet-static (= 0.6.13296)
+    sorbet-runtime (0.6.13296)
+    sorbet-static (0.6.13296-universal-darwin)
+    sorbet-static-and-runtime (0.6.13296)
+      sorbet (= 0.6.13296)
+      sorbet-runtime (= 0.6.13296)
+    spoom (1.7.16)
+      erubi (>= 1.10.0)
+      prism (>= 0.28.0)
+      rbi (>= 0.3.3)
+      rbs (>= 4.0.0.dev.5)
+      rexml (>= 3.2.6)
+      sorbet-static-and-runtime (>= 0.5.10187)
+      thor (>= 0.19.2)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -263,6 +289,18 @@ GEM
     sqlite3 (1.6.4)
       mini_portile2 (~> 2.8.0)
     stringio (3.2.0)
+    tapioca (0.19.1)
+      benchmark
+      bundler (>= 2.2.25)
+      netrc (>= 0.11.0)
+      parallel (>= 1.21.0)
+      rbi (>= 0.3.7)
+      require-hooks (>= 0.2.2)
+      rubydex (>= 0.1.0.beta10)
+      sorbet-static-and-runtime (>= 0.6.12698)
+      spoom (>= 1.7.9)
+      thor (>= 1.2.0)
+      tsort
     thor (1.5.0)
     timeout (0.6.1)
     tsort (0.2.0)
@@ -300,8 +338,11 @@ DEPENDENCIES
   rubocop (~> 1.69)
   rubocop-rails (~> 2.27)
   rubocop-rspec (~> 3.3)
+  sorbet
+  sorbet-runtime
   sprockets-rails
   sqlite3 (~> 1.4)
+  tapioca
   tzinfo-data
   web-console (>= 3.3.0)
 

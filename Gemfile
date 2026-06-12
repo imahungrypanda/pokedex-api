@@ -24,6 +24,8 @@ gem 'jsbundling-rails', '~> 1.3'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
+gem 'sorbet-runtime'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
@@ -32,6 +34,8 @@ group :development, :test do
   gem 'rubocop', '~> 1.69', require: false
   gem 'rubocop-rails', '~> 2.27', require: false
   gem 'rubocop-rspec', '~> 3.3', require: false
+  gem 'sorbet'
+  gem 'tapioca', require: false
 end
 
 group :development do
