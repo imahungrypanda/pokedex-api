@@ -3,3 +3,7 @@
 --ignore=tmp/
 --ignore=vendor/
 --parser=prism
+# Sorbet's bundled net.rbi is stale: it declares Net::IMAP::Literal < CommandData,
+# but net-imap 0.6.4 makes it < Data (correct, per Tapioca's gem RBI). Drop this once
+# Sorbet ships an updated net-imap payload.
+--suppress-payload-superclass-redefinition-for=Net::IMAP::Literal
