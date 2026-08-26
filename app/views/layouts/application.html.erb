@@ -5,7 +5,8 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= javascript_pack_tag 'index' %>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_include_tag "application", defer: true, type: "module" %>
   </head>
 
   <body>

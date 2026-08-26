@@ -1,20 +1,14 @@
-# == Schema Information
-#
-# Table name: pokemons
-#
-#  id           :integer          not null, primary key
-#  image_url    :string
-#  name         :string
-#  pokemon_type :string
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  pokemon_id   :integer
-#
+# frozen_string_literal: true
 
 class Pokemon < ApplicationRecord
-  validates :pokemon_id, presence: true
-  validates :pokemon_id, uniqueness: true
-  validates :name, presence: true
-  validates :name, uniqueness: true
-  validates :image_url, presence: true
+  serialize :base_stats, coder: JSON
+
+  validates :pokemon_id, presence: true, uniqueness: true
+  validates :name,       presence: true, uniqueness: true
+  validates :image_url,  presence: true
+  validates :height_dm, :weight_hg, numericality: { greater_than: 0 }, allow_nil: true
+
+  scope :ordered,     -> { order(:pokemon_id) }
+  scope :by_type,     ->(t) { where('pokemon_type = :t OR secondary_type = :t', t: t) if t.present? }
+  scope :search_name, ->(q) { where('LOWER(name) LIKE ?', "%#{q.downcase}%") if q.present? }
 end

@@ -265,6 +265,29 @@ You can also import these endpoints into Postman or Insomnia:
 - There is no authentication required for these endpoints (`skip_before_action :verify_authenticity_token`)
 - Pagination is not yet implemented for the index endpoint (see TODO in controller)
 
+### Expected pagination contract
+
+When `GET /api/v1/pokemon/index` is paginated, the frontend already sends
+`page_number` and `per_page` query params and expects this envelope:
+
+```json
+{
+  "data": [
+    { "id": 1, "pokemon_id": 1, "name": "bulbasaur", ... }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 24,
+    "total": 1025,
+    "total_pages": 43
+  }
+}
+```
+
+Until that envelope is returned, the UI falls back to slicing the flat
+array client-side. The `normalizeList` helper in
+`app/javascript/components/api/pokemon.js` handles both shapes.
+
 ---
 
 ## Quick Reference
