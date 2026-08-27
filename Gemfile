@@ -13,6 +13,8 @@ gem 'sqlite3', '~> 1.4'
 gem 'puma', '~> 6.4'
 # Bundle JavaScript via esbuild (Rails 7 default)
 gem 'jsbundling-rails', '~> 1.3'
+
+gem 'annotate'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
